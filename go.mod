@@ -1,5 +1,5 @@
-module seanvelasco/networkmanager
+module github.com/seanvelasco/networkmanager
 
-go 1.18.2
+go 1.18
 
 require github.com/godbus/dbus/v5 v5.1.0
