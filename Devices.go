@@ -18,7 +18,7 @@ func GetNetworkByType(typeName string) (interface{}, error) {
 	return devices.Value(), nil
 }
 
-func GetDeviceByType(targetDeviceType uint32) ([]interface{}, error) {
+func getDeviceByType(targetDeviceType uint32) ([]interface{}, error) {
 
 	devices, err := ListDevices()
 
@@ -70,7 +70,8 @@ func getDeviceInterface(devicePath dbus.ObjectPath) (map[string]interface{}, err
 	// ["Driver", "Ip4Connectivity"m "Ip6Connectivity", "Wired", "Wireless"]
 	// Create slice
 
-	attributes := []string{"Udi",
+	attributes := []string{
+		"Udi",
 		"Path",
 		"Interface",
 		"IpInterface",
@@ -121,6 +122,17 @@ func getDeviceInterface(devicePath dbus.ObjectPath) (map[string]interface{}, err
 	return deviceAttributes, nil
 }
 
+func listDevicesByPath() (interface{}, error) {
+	obj := c.Object("org.freedesktop.NetworkManager", "/org/freedesktop/NetworkManager")
+	devices, err := obj.GetProperty("org.freedesktop.NetworkManager.Devices")
+
+	if err != nil {
+		return nil, err
+	}
+
+	return devices.Value().([]dbus.ObjectPath), nil
+}
+
 func ListDevices() (interface{}, error) {
 	devices, err := listDevicesByPath()
 	if err != nil {
@@ -143,13 +155,26 @@ func ListDevices() (interface{}, error) {
 
 }
 
-func listDevicesByPath() (interface{}, error) {
-	obj := c.Object("org.freedesktop.NetworkManager", "/org/freedesktop/NetworkManager")
-	devices, err := obj.GetProperty("org.freedesktop.NetworkManager.Devices")
-
+func GetWirelessDevices() ([]interface{}, error) {
+	wirelessDevices, err := getDeviceByType(NM_DEVICE_TYPE_WIFI)
 	if err != nil {
 		return nil, err
 	}
+	return wirelessDevices, nil
+}
 
-	return devices.Value().([]dbus.ObjectPath), nil
+func GetWiredDevices() ([]interface{}, error) {
+	wirelessDevices, err := getDeviceByType(NM_DEVICE_TYPE_ETHERNET)
+	if err != nil {
+		return nil, err
+	}
+	return wirelessDevices, nil
+}
+
+func GetBluetoothDevices() ([]interface{}, error) {
+	bluetoothDevices, err := getDeviceByType(NM_DEVICE_TYPE_BT)
+	if err != nil {
+		return nil, err
+	}
+	return bluetoothDevices, nil
 }
